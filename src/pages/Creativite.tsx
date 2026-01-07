@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { openai } from '../utils/openai';
+import { openai } from '../utils/replicate';
+import { replicate } from '../utils/replicate';
+// ou gardez openai pour compatibilité
 
 const Creativite: React.FC = () => {
   const [prompt, setPrompt] = useState('');
@@ -22,7 +24,7 @@ const Creativite: React.FC = () => {
     try {
       let response;
       if (type === 'image') {
-        response = await openai.generateImage(prompt, style);
+        response = await replicate.generateImage(prompt, style);
       } else {
         response = await openai.generateVideo(prompt);
       }
