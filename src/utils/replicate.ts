@@ -1,66 +1,55 @@
 import axios from 'axios';
 
-// Utilisez cette URL pour le développement
 const API_BASE_URL = import.meta.env.DEV 
   ? 'http://localhost:3000/api'
-  : 'https://footre-app.vercel.app/api';
+  : 'https://footre.vercel.app/api';
 
 export const replicate = {
   async generateImage(prompt: string, style?: string) {
-    console.log('Generating image with prompt:', prompt);
+    console.log('ðŸ”„ GÃ©nÃ©ration image pour:', prompt, 'Style:', style || 'default');
+    
+    // Utiliser le style si fourni, sinon default
+    const enhancedPrompt = style 
+      ? `${prompt}, ${style} style`
+      : prompt;
     
     try {
       const response = await axios.post(`${API_BASE_URL}/generate-image`, {
-        prompt,
-        style: style || 'realistic-vision',
-        size: '1024x1024'
+        prompt: enhancedPrompt  // Inclure le style dans le prompt
       }, {
-        timeout: 60000  // 60 secondes pour Replicate
+        timeout: 45000,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
-      console.log('Replicate response:', response.data);
       return response.data;
       
     } catch (error: any) {
-      console.error('Replicate API Error:', error);
+      console.error('Erreur API:', error.message);
       
-      // Fallback images
-      const fallbackImages = [
-        'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=80',
-        'https://images.unsplash.com/photo-1577223625818-75bc1f2ac0e5?w=800&q=80',
-      ];
-      
-      const randomImage = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+      // Fallback avec style
+      const getFallbackImage = (style?: string) => {
+        const images = {
+          realistic: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=1024&q=80',
+          artistic: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=1024&q=80',
+          cartoon: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=1024&q=80',
+          default: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=1024&q=80'
+        };
+        
+        return images[style as keyof typeof images] || images.default;
+      };
       
       return {
-        url: randomImage,
+        success: true,
+        url: getFallbackImage(style),
         prompt: prompt,
-        revised_prompt: `${prompt} - football scene`,
+        style: style,
         isDemo: true,
         error: error.message
-      };
-    }
-  },
-
-  async generateVideo(prompt: string) {
-    // Replicate a aussi des modèles vidéo
-    try {
-      const response = await axios.post(`${API_BASE_URL}/generate-video`, {
-        prompt,
-        size: '1024x576'
-      });
-      return response.data;
-    } catch (error: any) {
-      console.error('Video API Error:', error);
-      
-      return {
-        url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        message: 'Demo video',
-        isMock: true
       };
     }
   }
 };
 
-// Pour compatibilité avec l'ancien code
 export const openai = replicate;
