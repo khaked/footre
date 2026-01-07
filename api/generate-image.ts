@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       n: 1,
     });
 
-    // Vérifier que response.data existe et a au moins un élément
+    // Vï¿½rifier que response.data existe et a au moins un ï¿½lï¿½ment
     if (!response.data || response.data.length === 0) {
       return res.status(500).json({ error: 'No image generated' });
     }
