@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.DEV 
-  ? 'http://localhost:3000/api'
+  ? 'http://localhost:5173/api'
   : 'https://footre.vercel.app/api';
+
 
 export const replicate = {
   async generateImage(prompt: string, style?: string) {
