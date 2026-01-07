@@ -62,8 +62,12 @@ module.exports = async function handler(req, res) {
 
         console.log('Calling Replicate API for prompt:', prompt);
         
-        // Prompt optimisé pour le football
-        const enhancedPrompt = \professional football scene, \, cinematic, detailed, 4k, stadium, players\;
+        // CORRECTION ICI : Remplacez les backslashes par des guillemets
+        // Ancienne ligne (avec erreur) :
+        // const enhancedPrompt = \professional football scene, \, cinematic, detailed, 4k, stadium, players\;
+        
+        // Nouvelle ligne (corrigée) :
+        const enhancedPrompt = `professional football scene, ${prompt}, cinematic, detailed, 4k, stadium, players`;
         
         // Utiliser Stable Diffusion
         const output = await replicate.run(
