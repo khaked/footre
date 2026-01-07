@@ -1,21 +1,35 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import OpenAI from 'openai';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
-  
-  console.log('Test API called');
-  console.log('Environment:', process.env.NODE_ENV);
-  console.log('OpenAI Key exists:', !!process.env.OPENAI_API_KEY);
-  
-  return res.status(200).json({
-    message: 'API is working',
-    timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV,
-    hasOpenAIKey: !!process.env.OPENAI_API_KEY
-  });
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'Tu es un assistant de test.' },
+        { role: 'user', content: 'Dis bonjour depuis OpenAI' }
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: completion.choices[0].message.content,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
 }
