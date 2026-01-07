@@ -1,12 +1,19 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import OpenAI from 'openai';
+
+// Images football pré-générées pour la démo
+const DEMO_IMAGES = [
+  'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=1024&q=80', // Football goal
+  'https://images.unsplash.com/photo-1577223625818-75bc1f2ac0e5?auto=format&fit=crop&w=1024&q=80', // Football player
+  'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&w=1024&q=80', // Stadium
+  'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?auto=format&fit=crop&w=1024&q=80', // Football team
+  'https://images.unsplash.com/photo-1577222714007-c7bd5c5d5c6e?auto=format&fit=crop&w=1024&q=80', // Football celebration
+];
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Configurer CORS
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -17,44 +24,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    console.log('API Key exists:', !!process.env.OPENAI_API_KEY);
-    
-    const { prompt, style, size } = req.body;
+    const { prompt } = req.body;
     
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
-
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
     
-    console.log('Generating image for prompt:', prompt);
-    
-    const response = await openai.images.generate({
-      model: "dall-e-3",
-      prompt: `${style ? `${style} style: ` : ''}${prompt}`,
-      size: size || "1024x1024",
-      quality: "standard",
-      n: 1,
-    });
-
-    if (!response.data || response.data.length === 0) {
-      return res.status(500).json({ error: 'No image generated' });
-    }
-
-    const imageData = response.data[0];
+    // Sélection aléatoire d'une image de démo
+    const randomIndex = Math.floor(Math.random() * DEMO_IMAGES.length);
+    const imageUrl = DEMO_IMAGES[randomIndex];
     
     return res.status(200).json({
-      url: imageData.url || '',
-      revised_prompt: imageData.revised_prompt || prompt
+      url: imageUrl,
+      revised_prompt: prompt,
+      isDemo: true,
+      note: 'Demo mode using pre-generated football images. Add OpenAI credits for AI generation.'
     });
-  } catch (error: any) {
-    console.error('OpenAI API error:', error);
     
-    return res.status(500).json({ 
-      error: 'Failed to generate image',
-      message: error.message 
-    });
+  } catch (error: any) {
+    console.error('Error:', error);
+    return res.status(500).json({ error: error.message });
   }
 }
