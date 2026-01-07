@@ -1,4 +1,4 @@
-﻿// api/generate-image.js - VERSION CORRIGÉE REPLICATE
+﻿// api/generate-image.js - VERSION FORCÉE REPLICATE
 const Replicate = require('replicate');
 
 const FALLBACK_IMAGES = [
@@ -28,9 +28,27 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    console.log('📝 Prompt reçu:', prompt);
+    console.log('API Replicate appelée avec prompt:', prompt);
 
-    // 🔥 VÉRIFIEZ QUE C'EST BIEN REPLICATE, PAS OPENAI
+    // 🔥 FORCER LE MODE DÉMO POUR L'INSTANT
+    console.log('⚠️  MODE DÉMO FORCÉ');
+    const fallbackImage = FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)];
+    
+    // Simuler un délai
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return res.status(200).json({
+      success: true,
+      url: fallbackImage,
+      prompt: prompt,
+      revised_prompt: `${prompt} - football scene`,
+      provider: 'demo',
+      isDemo: true,
+      note: 'Mode démo - Configurez Replicate sur Vercel'
+    });
+
+    // 🔥 COMMENTEZ TOUT LE CODE REPLICATE POUR L'INSTANT
+    /*
     if (!process.env.REPLICATE_API_TOKEN) {
       console.log('⚠️  Mode démo - Pas de clé Replicate');
       const fallbackImage = FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)];
@@ -44,14 +62,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // 🔥 INITIALISER REPLICATE, PAS OPENAI
     const replicate = new Replicate({
-      auth: process.env.REPLICATE_API_TOKEN, // Doit être r8_...
+      auth: process.env.REPLICATE_API_TOKEN,
     });
 
     console.log('🔑 Clé Replicate configurée');
 
-    // Utiliser un modèle Replicate (SDXL)
     const enhancedPrompt = `professional football scene, ${prompt}, cinematic, 4k, stadium`;
     
     console.log('🔄 Appel à Replicate API...');
@@ -81,11 +97,12 @@ export default async function handler(req, res) {
       provider: 'replicate',
       isAI: true
     });
+    */
 
   } catch (error) {
-    console.error('🔥 Erreur Replicate:', error.message);
+    console.error('🔥 Erreur:', error.message);
     
-    // Fallback
+    // Fallback ultime
     const fallbackImage = FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)];
     
     return res.status(200).json({
@@ -93,7 +110,8 @@ export default async function handler(req, res) {
       url: fallbackImage,
       prompt: req.body?.prompt || 'football',
       isDemo: true,
-      error: error.message
+      error: error.message,
+      note: 'Erreur, fallback activé'
     });
   }
 }
