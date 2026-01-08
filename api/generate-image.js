@@ -1,6 +1,5 @@
 ﻿import Replicate from "replicate";
 
-// Images de fallback si l'API échoue
 const FALLBACK_IMAGES = [
   "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=1024&q=80",
   "https://images.unsplash.com/photo-1577223625818-75bc1f2ac0e5?w=1024&q=80",
@@ -8,7 +7,6 @@ const FALLBACK_IMAGES = [
 ];
 
 export default async function handler(req, res) {
-  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -25,7 +23,6 @@ export default async function handler(req, res) {
 
   try {
     const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
-
     const enhancedPrompt = `professional football scene, ${prompt}, cinematic, 4k, stadium`;
 
     const output = await replicate.run(
