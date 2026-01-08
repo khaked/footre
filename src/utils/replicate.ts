@@ -27,4 +27,3 @@ export const replicate = {
   },
 };
 
-export const openai = replicate;
