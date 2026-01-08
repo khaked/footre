@@ -1,8 +1,9 @@
 import axios from "axios";
 
+// URL de l'API (Vercel ou local)
 const API_BASE_URL = import.meta.env.DEV
-  ? "http://localhost:3000/api" // Assurez-vous que le backend tourne sur 3000
-    : "https://footre-7b6d99v5o-khakeds-projects-14af3630.vercel.app/api";
+  ? "http://localhost:3000/api" // Local
+  : "https://footre-7b6d99v5o-khakeds-projects-14af3630.vercel.app/api"; // Déployé
 
 export const replicate = {
   async generateImage(prompt: string, style?: string) {
@@ -17,10 +18,12 @@ export const replicate = {
         { timeout: 45000, headers: { "Content-Type": "application/json" } }
       );
 
+      console.log("Réponse API:", response.data);
       return response.data;
     } catch (error: any) {
-      console.error("Erreur API:", error.message);
+      console.error("Erreur génération image:", error.response?.data || error.message);
 
+      // Fallback si l'API échoue
       const FALLBACK_IMAGES: Record<string, string> = {
         realistic: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=1024&q=80",
         artistic: "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=1024&q=80",
@@ -34,11 +37,10 @@ export const replicate = {
         prompt,
         style,
         isDemo: true,
-        error: error.message,
+        error: error.response?.data?.error || error.message,
       };
     }
   },
 };
 
-// Pour compatibilité, openai = replicate (si tu veux garder le code vidéo)
-export const openai = replicate;
+export const openai = replicate; // Pour compatibilité si tu gardes le code vidéo
