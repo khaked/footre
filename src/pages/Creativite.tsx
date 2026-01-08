@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { replicate } from '../utils/replicate';
-// ou gardez openai pour compatibilité
+
 
 const Creativite: React.FC = () => {
   const [prompt, setPrompt] = useState('');
